@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
 
 def get_unique_text(variants_df, text_df, cls, save = None, suppress_output = True):
     """
@@ -32,4 +33,21 @@ def get_unique_text(variants_df, text_df, cls, save = None, suppress_output = Tr
         f.close()
 
     return unique_text_string
-    
+
+def get_number_instances(docs, vocabulary):
+    """
+    docs: list of strings
+    vocabulary: list of strings
+
+    Returns a numpy array which vectorizes the
+    documents according to the number of instances
+    of terms in the vocabulary.
+    Each -row- of the returned array corresponds
+    to a document vector. e.g. to get the
+    document vector for document 3, use
+    x[3,:]
+    """
+
+    cv = CountVectorizer(vocabulary=vocabulary)
+    x = cv.fit_transform(docs).toarray()
+    return x
