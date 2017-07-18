@@ -1,0 +1,6 @@
+test_text
+training_text
+test_variants
+training_variants
+*.pyc
+*~
