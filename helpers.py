@@ -51,3 +51,16 @@ def get_number_instances(docs, vocabulary):
     cv = CountVectorizer(vocabulary=vocabulary)
     x = cv.fit_transform(docs).toarray()
     return x
+
+def train_test_split(train_variation_file, train_text_file):
+    """
+    This function takes the variants and text file and splits them into 80% for training and 20% 
+    for testing in a stratifiled way according to classes, and returns four DataFrames:
+    text_train, text_test, variants_train, variants_test
+    """
+    from sklearn.model_selection import train_test_split
+    import pandas as pd
+    y = pd.read_csv(train_variation_file)
+    X = pd.read_csv(train_text_file, sep="\|\|", engine="python", skiprows=1, names=["ID", "Text"])
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y.Class)
+    return X_train, X_test, y_train, y_test
