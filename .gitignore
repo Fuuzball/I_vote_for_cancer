@@ -4,3 +4,4 @@ test_variants
 training_variants
 *.pyc
 *~
+presentation/slides.pdf
