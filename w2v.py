@@ -48,7 +48,7 @@ class W2vVectorizer:
     def doc2vec(self, doc, tfidf=True):
         ### convert a document to a vector
 
-        words = doc.split(' ')
+        words = doc.lower().split(' ')
         v = np.zeros(self.Ndim)
 
         if tfidf:
@@ -58,6 +58,7 @@ class W2vVectorizer:
             for i, w in enumerate(words):
                 try:
                     indices[i] = self.tfidf.vocabulary_[w]
+                    M[i,:] = self.word2vec(w)
                 except:
                     error_indices[i] = 0
             weights = np.log(self.tfidf.idf_[indices])*error_indices
@@ -116,8 +117,8 @@ class W2vClassifier:
             d = np.zeros(9)
             for i in range(9):
                 d[i] = np.linalg.norm(X[n,:] - ctr[i,:])
-                d = d/np.linalg.norm(d)
-                p[n,:] = d
+            d = d/np.sum(d)
+            p[n,:] = d
         return p
 
     def logloss(self,y_train, X):
@@ -126,6 +127,5 @@ class W2vClassifier:
         x = 0
         for i in range(N):
             x+= np.dot(y[i,:], np.log2(X[i,:]))
-            x = (-1./N)*x
+        x = (-1./N)*x
         return x
-        
