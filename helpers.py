@@ -174,4 +174,19 @@ def kfold_score(clf, X,y, splits=3):
         y_true = lb.transform(y[test])
         values.append(log_loss(y_true, y_test_prob))
     return np.mean(values)
+
+def submission(filename, prob_matrix):
+    """
+    filename: location of csv file
+    prob_matrix: matrix of dimension(n_sample, n_class)
+    """
+    with open(filename, 'w') as f:
+        f.write('ID,class1,class2,class3,class4,class5,class6,class7,class8,class9\n')
+        for i in range(prob_matrix.shape[0]):
+            f.write(str(i)+',')
+            for j in range(prob_matrix.shape[1]):
+                f.write(str(prob_matrix[i][j]))
+                if j<8:
+                    f.write(',')
+            f.write('\n')
     
