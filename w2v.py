@@ -55,15 +55,20 @@ class W2vVectorizer:
             indices = np.zeros(len(words), dtype = int)
             error_indices = np.ones_like(indices)
             M = np.zeros((len(words), self.Ndim))
+            N = 0
             for i, w in enumerate(words):
                 try:
                     indices[i] = self.tfidf.vocabulary_[w]
                     M[i,:] = self.word2vec(w)
+                    N += 1
                 except:
                     error_indices[i] = 0
-            weights = np.log(self.tfidf.idf_[indices])*error_indices
+            #weights = np.log(self.tfidf.idf_[indices])*error_indices
+            #weights = (1-self.tfidf.idf_[indices])*error_indices
+            weights = (self.tfidf.idf_[indices])*error_indices
             for i, w in enumerate(words):
                 v += weights[i]*M[i,:]
+            v = (1./N)*v
         else:
             N = 0
             for w in words:
