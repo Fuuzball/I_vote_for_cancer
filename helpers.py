@@ -133,10 +133,10 @@ def plot_roc_curve(y_test, y_score):
     plt.legend(loc="lower right")
     plt.show()
 
-def get_1st_layer_data(train_variation_file, train_text_file):
+def get_training(train_variation_file, train_text_file):
     """
-    use this to get 70% data from training_variants and training_text 
-    to use for 1st layer training
+    use this to get 80% data from training_variants and training_text 
+    to use for training
     """
     import pandas as pd
     train = list(pd.read_csv('./train_index',names = ['ID','ID2'])['ID'])
@@ -144,18 +144,7 @@ def get_1st_layer_data(train_variation_file, train_text_file):
     X = pd.read_csv(train_text_file, sep="\|\|", engine="python", skiprows=1, names=["ID", "Text"])
     return X.iloc[train, :], y.iloc[train, :]
 
-def get_2nd_layer_data(train_variation_file, train_text_file):
-    """
-    use this to get 10% data from training_variants and training_text 
-    to use for 2nd layer training
-    """
-    import pandas as pd
-    val = list(pd.read_csv('./val_index',names = ['ID','ID2'])['ID'])
-    y = pd.read_csv(train_variation_file)
-    X = pd.read_csv(train_text_file, sep="\|\|", engine="python", skiprows=1, names=["ID", "Text"])
-    return X.iloc[val, :], y.iloc[val, :]
-
-def get_test_for_final_score(train_variation_file, train_text_file):
+def get_test(train_variation_file, train_text_file):
     """
     use this to get 20% data from training_variants and training_text 
     for reporting final score, don't use it for model selection or parameter tuning
