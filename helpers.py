@@ -3,6 +3,9 @@
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.metrics import log_loss
+from sklearn.preprocessing import LabelBinarizer
 
 def get_unique_text(variants_df, text_df, cls, save = None, suppress_output = True):
     """
@@ -154,3 +157,21 @@ def get_test(train_variation_file, train_text_file):
     y = pd.read_csv(train_variation_file)
     X = pd.read_csv(train_text_file, sep="\|\|", engine="python", skiprows=1, names=["ID", "Text"])
     return X.iloc[test, :], y.iloc[test, :]
+
+def kfold_score(clf, X,y, splits=3):
+    '''
+    clf is the classifier. X is all the training data,
+    y is the labels. Returns average log-loss over
+    the k folds
+    '''
+    lb = LabelBinarizer()
+    lb.fit(y)
+    k_fold = KFold(n_splits=splits)
+    values = []
+    for train, test in k_fold.split(X):
+        clf.fit(X[train], y[train])
+        y_test_prob = clf.predict_proba(X[test])
+        y_true = lb.transform(y[test])
+        values.append(log_loss(y_true, y_test_prob))
+    return np.mean(values)
+    
