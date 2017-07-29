@@ -11,6 +11,10 @@ import helpers
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors.nearest_centroid import NearestCentroid
+from sklearn import svm
+from sklearn.preprocessing import label_binarize
+from sklearn.multiclass import OneVsRestClassifier
+
 
 class W2vVectorizer:
 
@@ -79,58 +83,35 @@ class W2vVectorizer:
                     pass # word not in dictionary
             v = (1./N)*v
         return v # return average word vector over the document
-        
-    def reduce_dimensionality(self, word_vectors, dimension=2):
-        data = np.array(word_vectors)
-        pca = dcmp.PCA(n_components=dimension)
-        pca.fit(data)
-        return pca.transform(data)
-
-
-class W2vClassifier:
-
-    def __init__(self, w2v):
-        self.w2v = w2v
-        
-    def onehot(self,y):
-        output = np.zeros((len(y), 9))
-        for i,n in enumerate(y):
-            output[i,n-1]=1
-        return output
 
     def vectorize_documents(self, docs, tfidf = True):
         ''' Return a matrix of document vectors '''
         N = len(docs)
-        X = np.zeros((N, self.w2v.Ndim))
+        X = np.zeros((N, self.Ndim))
         for i,doc in enumerate(docs):
-            X[i,:] = self.w2v.doc2vec(doc, tfidf)
+            X[i,:] = self.doc2vec(doc, tfidf)
             if i%500 == 0: print(i)
         return X
 
-    def fit(self, docs, y, tfidf = True):
-        X = self.vectorize_documents(docs, tfidf)
-        self.X_train = X
-        self.clf = NearestCentroid()
-        self.clf.fit(X, y)
-        self.centroids = self.clf.centroids_ # centroid vectors
 
-    def predict(self, X):
-        p = np.zeros((X.shape[0], 9))
-        ctr = self.centroids
-        
-        for n in range(X.shape[0]):
-            d = np.zeros(9)
-            for i in range(9):
-                d[i] = np.linalg.norm(X[n,:] - ctr[i,:])
-            d = d/np.sum(d)
-            p[n,:] = d
-        return p
+def onehot(y):
+    output = np.zeros((len(y), 9))
+    for i,n in enumerate(y):
+        output[i,n-1]=1
+    return output
 
-    def logloss(self,y_train, X):
-        y = self.onehot(y_train)
-        N = X.shape[0]
-        x = 0
-        for i in range(N):
-            x+= np.dot(y[i,:], np.log2(X[i,:]))
-        x = (-1./N)*x
-        return x
+def find_pcs(X, dimension):
+    """ compute principle components """
+    pca = dcmp.PCA(n_components = dimension)
+    pca.fit(X)
+    return pca
+
+def train_svm(X, y, C = 1.0, kernel = 'linear', class_weight = 'balanced'):
+    '''
+    y is a one-hotarray of training labels. Returns the classifier.
+    '''
+    clf = OneVsRestClassifier(svm.SVC(C=C, kernel=kernel, probability=True,
+                                      random_state=0, class_weight=class_weight))
+
+    clf.fit(X, y)
+    return clf
