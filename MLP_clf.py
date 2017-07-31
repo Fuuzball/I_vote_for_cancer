@@ -2,6 +2,16 @@ import numpy as np
 import tensorflow as tf
 
 np.set_printoptions(precision=2)
+<<<<<<< HEAD
+X_train = np.load('./data/wtf_X_train.npy')
+y_train = np.load('./data/wtf_y_train.npy')
+X_test = np.load('./data/wtf_X_test.npy')
+y_test = np.load('./data/wtf_y_test.npy')
+
+train_size, n_input = X_train.shape
+
+n_classes = 9
+=======
 X_train = np.load('./data/train_doc.npy')
 y_train = np.load('./data/train_label.npy')
 X_test = np.load('./data/test_doc.npy')
@@ -10,6 +20,7 @@ y_test = np.load('./data/test_label.npy')
 n_input = 100
 n_classes = 9
 train_size = X_train.shape[0]
+>>>>>>> 11f67855b390f567660e55e6ea3756800eaae576
 
 def get_batch(n_batch):
     train_indices = np.arange(train_size)
@@ -21,13 +32,22 @@ x = tf.placeholder(tf.float32, [None, n_input])
 y = tf.placeholder(tf.float32, [None, n_classes])
 
 # Training params
+<<<<<<< HEAD
+learning_rate = 0.0015
+training_epochs = 2000
+=======
 learning_rate = 0.005
 training_epochs = 500
+>>>>>>> 11f67855b390f567660e55e6ea3756800eaae576
 batch_size = 100
 display_epoch = 10
 
 # Network Params
+<<<<<<< HEAD
+n_hidden = 75
+=======
 n_hidden = 25
+>>>>>>> 11f67855b390f567660e55e6ea3756800eaae576
 
 def test_model(learning_rate, training_epochs, batch_size, n_hidden):
     # Construct model
@@ -42,7 +62,11 @@ def test_model(learning_rate, training_epochs, batch_size, n_hidden):
 
     u = tf.nn.relu(tf.matmul(x, W1) + b1)
     pred = tf.nn.softmax(tf.matmul(u, W2) + b2)
+<<<<<<< HEAD
+    #pred = tf.nn.softmax(tf.matmul(x, W) + b)
+=======
     pred = tf.nn.softmax(tf.matmul(x, W) + b)
+>>>>>>> 11f67855b390f567660e55e6ea3756800eaae576
     x_entropy = tf.reduce_mean(-tf.reduce_sum(y * tf.log(pred + 10**(-15)), reduction_indices=[1]))
 
     train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(x_entropy)
