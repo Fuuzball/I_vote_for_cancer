@@ -189,4 +189,14 @@ def submission(filename, prob_matrix):
                 if j<8:
                     f.write(',')
             f.write('\n')
+
+def get_full_table(variants_file, text_file):
+	"""create full table from text and variantes"""
+
+	variants = pd.read_csv(variants_file)
+	text = pd.read_csv(text_file, sep="\|\|", engine="python", skiprows=1, names=["ID", "Text"])
+	data_full = variants.merge(text, how='inner', on='ID')
+	return data_full
+
+
     
