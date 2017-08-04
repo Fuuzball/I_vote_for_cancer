@@ -17,7 +17,7 @@ class pca_placeholder: # placeholder class for pca. Does nothing.
         pass
 
 def train_ensemble_classifier(predictions, y, C = 1.):
-    X = np.concatenate(predictions, axis=1)
+    X = np.log(np.concatenate(predictions, axis=1))
     clf = OneVsRestClassifier(svm.SVC(C=C, kernel='linear', probability=True, random_state=0, class_weight='balanced'))
     print('Training ensemble classifier')
     clf.fit(X, y)
@@ -124,19 +124,29 @@ if __name__ == '__main__':
     
     #xgb_train_prob = load_train_test_data('./2nd_layer_data/xgboost/train_prob', './2nd_layer_data/xgboost/test_prob')
     #tfidf_train_prob = load_train_test_data('./2nd_layer_data/tfidf/train_prob', './2nd_layer_data/tfidf/test_prob')
-    w2v_train_prob = load_single('./2nd_layer_data/w2v/test_prob')
-    var_train_prob = load_single('./2nd_layer_data/only_var/test_prob')
-    gene_train_prob = load_single('./2nd_layer_data/only_gene/test_prob')
-    xgb_train_prob = load_single('./2nd_layer_data/xgboost/test_prob')
-    tfidf_train_prob = load_single('./2nd_layer_data/tfidf/test_prob')
-    genevar_train_prob = load_single('./2nd_layer_data/gene-var/test_prob')
+    w2v_train_prob = load_single('./2nd_layer_data/w2v/train_prob')
+    var_train_prob = load_single('./2nd_layer_data/only_var/train_prob')
+    gene_train_prob = load_single('./2nd_layer_data/only_gene/train_prob')
+    xgb_train_prob = load_single('./2nd_layer_data/xgboost/train_prob')
+    tfidf_train_prob = load_single('./2nd_layer_data/tfidf/train_prob')
+    genevar_train_prob = load_single('./2nd_layer_data/gene-var/train_prob')
 
-    
+    w2v_val_prob = load_single('./2nd_layer_data/w2v/test_prob')
+    var_val_prob = load_single('./2nd_layer_data/only_var/test_prob')
+    gene_val_prob = load_single('./2nd_layer_data/only_gene/test_prob')
+    xgb_val_prob = load_single('./2nd_layer_data/xgboost/test_prob')
+    tfidf_val_prob = load_single('./2nd_layer_data/tfidf/test_prob')
+    genevar_val_prob = load_single('./2nd_layer_data/gene-var/test_prob')
+
     #predictions = [xgb_train_prob, w2v_train_prob, var_train_prob, gene_train_prob]
-    predictions = [xgb_train_prob, tfidf_train_prob, w2v_train_prob, genevar_train_prob]
-    X_ensemble = np.concatenate(predictions, axis = 1)
-    clf_ensemble = train_ensemble_classifier(predictions, y_train[N:])
+    predictions = [ genevar_val_prob, tfidf_val_prob, xgb_val_prob]
+    X_ensemble = np.log(np.concatenate(predictions, axis = 1))
+    X_validate = np.log(np.concatenate([ genevar_train_prob, tfidf_train_prob, xgb_train_prob] , axis=1))
+    clf_ensemble = train_ensemble_classifier(predictions, y_train[N:], C=1e-3)
+    print('train error')
     print(log_loss(y_train[N:], clf_ensemble.predict_proba(X_ensemble)))
+    print('validation error')
+    print(log_loss(y_train[0:N], clf_ensemble.predict_proba(X_validate)))
     print('building test submission')
 
     xgb_test_prob = load_single('./2nd_layer_data/xgboost/true_test_prob')
@@ -152,6 +162,7 @@ if __name__ == '__main__':
 
 
     #predictions = [xgb_test_prob, w2v_test_prob, var_test_prob, gene_test_prob]
-    predictions = [xgb_test_prob, tfidf_test_prob, w2v_test_prob, genevar_test_prob]
-    X_ensemble = np.concatenate(predictions, axis = 1)
+    #predictions = [xgb_test_prob, tfidf_test_prob, w2v_test_prob, genevar_test_prob]
+    predictions = [ genevar_test_prob, tfidf_test_prob, xgb_test_prob]
+    X_ensemble = np.log(np.concatenate(predictions, axis = 1))
     helpers.submission('ensemble_submit', clf_ensemble.predict_proba(X_ensemble))
