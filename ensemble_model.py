@@ -82,54 +82,61 @@ if __name__ == '__main__':
     #test_gene = test_data.Gene
     #test_variant = test_data.Variation
     
-    w2v_train_features = np.load('./data/w2v_train_features.npy')
-    w2v_test_features = np.load('./data/w2v_test_features.npy')
+    #w2v_train_features = np.load('./data/w2v_train_features.npy')
+    #w2v_test_features = np.load('./data/w2v_test_features.npy')
 
     # --- w2v classifier ---
 
-    clf, pca, X, k = train_w2v_classifier( w2v_train_features[0:N], y_train[0:N])
-    helpers.submission('./2nd_layer_data/w2v/train_prob',clf.predict_proba(X/k))
-    print('w2v train logloss')
-    print(log_loss(y_train[0:N], clf.predict_proba(X/k)))
-    X_val = pca.transform(w2v_train_features[N:])
-    print ('w2v validation logloss')
-    print(log_loss(y_train[N:], clf.predict_proba(X_val/k)))
-    helpers.submission('./2nd_layer_data/w2v/test_prob',clf.predict_proba(X_val/k))
-    
-    #X_test = pca_w2v.transform(w2v_test_features)
-    #helpers.submission('./2nd_layer_data/w2v/true_test_prob',clf_w2v.predict_proba(X_w2v_test/k_w2v))
+    #clf, pca, X, k = train_w2v_classifier( w2v_train_features[0:N], y_train[0:N])
+    #helpers.submission('./2nd_layer_data/w2v/train_prob',clf.predict_proba(X/k))
+    #print('w2v train logloss')
+    #print(log_loss(y_train[0:N], clf.predict_proba(X/k)))
+    #X_val = pca.transform(w2v_train_features[N:])
+    #print ('w2v validation logloss')
+    #print(log_loss(y_train[N:], clf.predict_proba(X_val/k)))
+    #helpers.submission('./2nd_layer_data/w2v/test_prob',clf.predict_proba(X_val/k))
+    #X_test = pca.transform(w2v_test_features)
+    #helpers.submission('./2nd_layer_data/w2v/true_test_prob',clf.predict_proba(X_test/k))
 
     # --- variants classifier ---
-    #clf, vec, pca, X, k = train_count_classifier(X_text, variants, y_train, pca_dim= 50)
+    #clf, vec, pca, X, k = train_count_classifier(X_text[0:N], variants[0:N], y_train[0:N], pca_dim= 50)
     #helpers.submission('./2nd_layer_data/only_var/train_prob',clf.predict_proba(X/k))
+    #print ('var train logloss')
+    #print(log_loss(y_train[0:N], clf.predict_proba(X/k)))
+    #X_val = pca.transform(vec.transform(X_text[N:]).toarray())
+    #print ('var validation logloss')
+    #print(log_loss(y_train[N:], clf.predict_proba(X_val/k)))
+    #helpers.submission('./2nd_layer_data/only_var/test_prob',clf.predict_proba(X_val/k))
     #X_test = pca.transform(vec.transform(test_text).toarray())
     #helpers.submission('./2nd_layer_data/only_var/true_test_prob',clf.predict_proba(X_test/k))
-    
+
     # --- gene classifier ---
-    #clf, vec, pca, X, k = train_count_classifier(X_text, genes, y_train, pca_dim= 50)
+    #clf, vec, pca, X, k = train_count_classifier(X_text[0:N], variants[0:N], y_train[0:N], pca_dim= 50)
     #helpers.submission('./2nd_layer_data/only_gene/train_prob',clf.predict_proba(X/k))
+    #print ('gene train logloss')
+    #print(log_loss(y_train[0:N], clf.predict_proba(X/k)))
+    #X_val = pca.transform(vec.transform(X_text[N:]).toarray())
+    #print ('gene validation logloss')
+    #print(log_loss(y_train[N:], clf.predict_proba(X_val/k)))
+    #helpers.submission('./2nd_layer_data/only_gene/test_prob',clf.predict_proba(X_val/k))
     #X_test = pca.transform(vec.transform(test_text).toarray())
     #helpers.submission('./2nd_layer_data/only_gene/true_test_prob',clf.predict_proba(X_test/k))
     
-    #clf_gene, vec_gene, pca_gene, X_gene, k_gene = train_count_classifier(X_text, genes, y_train, pca_dim= 50)
-    #print(log_loss(y_train, clf_gene.predict_proba(X_gene/k_gene)))
+    #xgb_train_prob = load_train_test_data('./2nd_layer_data/xgboost/train_prob', './2nd_layer_data/xgboost/test_prob')
+    #tfidf_train_prob = load_train_test_data('./2nd_layer_data/tfidf/train_prob', './2nd_layer_data/tfidf/test_prob')
+    w2v_train_prob = load_single('./2nd_layer_data/w2v/test_prob')
+    var_train_prob = load_single('./2nd_layer_data/only_var/test_prob')
+    gene_train_prob = load_single('./2nd_layer_data/only_gene/test_prob')
+    xgb_train_prob = load_single('./2nd_layer_data/xgboost/test_prob')
+    tfidf_train_prob = load_single('./2nd_layer_data/tfidf/test_prob')
+    genevar_train_prob = load_single('./2nd_layer_data/gene-var/test_prob')
 
     
-    xgb_train_prob = load_train_test_data('./2nd_layer_data/xgboost/train_prob', './2nd_layer_data/xgboost/test_prob')
-    tfidf_train_prob = load_train_test_data('./2nd_layer_data/tfidf/train_prob', './2nd_layer_data/tfidf/test_prob')
-    w2v_train_prob = load_single('./2nd_layer_data/w2v/train_prob')
-    var_train_prob = load_single('./2nd_layer_data/only_var/train_prob')
-    gene_train_prob = load_single('./2nd_layer_data/only_gene/train_prob')
-
-    base_prob = np.zeros_like(xgb_train_prob)
-    for i in range(base_prob.shape[0]):
-        base_prob[i,:] = np.array([ 0.17103282,  0.13610358,  0.02679916,  0.20656429,  0.07286962, 0.08280638,  0.28696176,  0.00572117,  0.01114122])
-
     #predictions = [xgb_train_prob, w2v_train_prob, var_train_prob, gene_train_prob]
-    predictions = [xgb_train_prob, tfidf_train_prob, w2v_train_prob, var_train_prob, gene_train_prob]
+    predictions = [xgb_train_prob, tfidf_train_prob, w2v_train_prob, genevar_train_prob]
     X_ensemble = np.concatenate(predictions, axis = 1)
-    clf_ensemble = train_ensemble_classifier(predictions, y_train)
-    print(log_loss(y_train, clf_ensemble.predict_proba(X_ensemble)))
+    clf_ensemble = train_ensemble_classifier(predictions, y_train[N:])
+    print(log_loss(y_train[N:], clf_ensemble.predict_proba(X_ensemble)))
     print('building test submission')
 
     xgb_test_prob = load_single('./2nd_layer_data/xgboost/true_test_prob')
@@ -137,6 +144,7 @@ if __name__ == '__main__':
     w2v_test_prob = load_single('./2nd_layer_data/w2v/true_test_prob')
     var_test_prob = load_single('./2nd_layer_data/only_var/true_test_prob')
     gene_test_prob = load_single('./2nd_layer_data/only_gene/true_test_prob')
+    genevar_test_prob = load_single('./2nd_layer_data/gene-var/true_test_prob')
 
     base_prob = np.zeros_like(xgb_test_prob)
     for i in range(base_prob.shape[0]):
@@ -144,6 +152,6 @@ if __name__ == '__main__':
 
 
     #predictions = [xgb_test_prob, w2v_test_prob, var_test_prob, gene_test_prob]
-    predictions = [xgb_test_prob, tfidf_test_prob, w2v_test_prob, var_test_prob, gene_test_prob]
+    predictions = [xgb_test_prob, tfidf_test_prob, w2v_test_prob, genevar_test_prob]
     X_ensemble = np.concatenate(predictions, axis = 1)
     helpers.submission('ensemble_submit', clf_ensemble.predict_proba(X_ensemble))
