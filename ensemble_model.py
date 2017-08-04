@@ -61,7 +61,8 @@ def construct_training_data():
     y_train = y.Class
     genes = y.Gene
     variants = y.Variation
-    return X_text, genes, variants, y_train
+    N_train = X1.shape[0]
+    return X_text, genes, variants, y_train, N_train
 
 def load_train_test_data(train_file, test_file):
     X1 = np.loadtxt(train_file,skiprows=1, delimiter=',')
@@ -74,21 +75,28 @@ def load_single(train_file):
 
 
 if __name__ == '__main__':
-    X_text, genes, variants, y_train = construct_training_data()
+    X_text, genes, variants, y_train, N = construct_training_data()
     #test_data = pd.read_csv("./data/test_text", sep="\|\|", engine="python", skiprows=1, names=["ID", "Text"])
     #test_text = test_data.Text
     #test_data = pd.read_csv("./data/test_variants") # overwrite test_data as it is not needed
     #test_gene = test_data.Gene
     #test_variant = test_data.Variation
     
-    #w2v_train_features = np.load('./data/w2v_train_features.npy')
-    #w2v_test_features = np.load('./data/w2v_test_features.npy')
+    w2v_train_features = np.load('./data/w2v_train_features.npy')
+    w2v_test_features = np.load('./data/w2v_test_features.npy')
 
     # --- w2v classifier ---
 
-    #clf_w2v, pca_w2v, X_w2v, k_w2v = train_w2v_classifier( w2v_train_features, y_train)
-    #helpers.submission('./2nd_layer_data/w2v/train_prob',clf_w2v.predict_proba(X_w2v/k_w2v))
-    #X_w2v_test = pca_w2v.transform(w2v_test_features)
+    clf, pca, X, k = train_w2v_classifier( w2v_train_features[0:N], y_train[0:N])
+    helpers.submission('./2nd_layer_data/w2v/train_prob',clf.predict_proba(X/k))
+    print('w2v train logloss')
+    print(log_loss(y_train[0:N], clf.predict_proba(X/k)))
+    X_val = pca.transform(w2v_train_features[N:])
+    print ('w2v validation logloss')
+    print(log_loss(y_train[N:], clf.predict_proba(X_val/k)))
+    helpers.submission('./2nd_layer_data/w2v/test_prob',clf.predict_proba(X_val/k))
+    
+    #X_test = pca_w2v.transform(w2v_test_features)
     #helpers.submission('./2nd_layer_data/w2v/true_test_prob',clf_w2v.predict_proba(X_w2v_test/k_w2v))
 
     # --- variants classifier ---
